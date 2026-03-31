@@ -132,7 +132,7 @@ export const PRIORITY_LABELS = {
  * Energy level config.
  */
 export const ENERGY_LEVELS = [
-  { value: 'low', label: 'Low Energy', icon: '🌙', color: 'text-blue-400' },
-  { value: 'medium', label: 'Medium', icon: '⚡', color: 'text-yellow-400' },
-  { value: 'high', label: 'High Energy', icon: '🔥', color: 'text-orange-400' },
+  { value: 'low', label: 'Low', iconName: 'Moon' },
+  { value: 'medium', label: 'Medium', iconName: 'Zap' },
+  { value: 'high', label: 'High', iconName: 'Flame' },
 ]

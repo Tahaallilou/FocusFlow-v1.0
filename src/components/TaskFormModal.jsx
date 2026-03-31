@@ -29,9 +29,6 @@ const defaultForm = {
   focusRequired: false,
 }
 
-/**
- * @param {{ open: boolean, onClose: () => void, onSave: (task: object) => void, task?: object }} props
- */
 export default function TaskFormModal({ open, onClose, onSave, task }) {
   const [form, setForm] = useState(defaultForm)
 
@@ -53,7 +50,6 @@ export default function TaskFormModal({ open, onClose, onSave, task }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!form.title.trim()) return
-
     const data = {
       ...form,
       deadline: form.deadline ? new Date(form.deadline).getTime() : null,
@@ -61,22 +57,20 @@ export default function TaskFormModal({ open, onClose, onSave, task }) {
       priority: Number(form.priority),
       estimatedTime: Number(form.estimatedTime),
     }
-
     onSave(data)
     onClose()
   }
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{task ? 'Edit Task' : 'Add New Task'}</DialogTitle>
+          <DialogTitle>{task ? 'Edit Task' : 'New Task'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          {/* Title */}
           <div className="space-y-1.5">
-            <Label htmlFor="task-title">Title *</Label>
+            <Label htmlFor="task-title">Title</Label>
             <Input
               id="task-title"
               placeholder="What needs to be done?"
@@ -86,7 +80,6 @@ export default function TaskFormModal({ open, onClose, onSave, task }) {
             />
           </div>
 
-          {/* Description */}
           <div className="space-y-1.5">
             <Label htmlFor="task-desc">Description</Label>
             <Textarea
@@ -98,8 +91,7 @@ export default function TaskFormModal({ open, onClose, onSave, task }) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* Deadline */}
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="task-deadline">Deadline</Label>
               <Input
@@ -109,10 +101,8 @@ export default function TaskFormModal({ open, onClose, onSave, task }) {
                 onChange={(e) => set('deadline', e.target.value)}
               />
             </div>
-
-            {/* Estimated time */}
             <div className="space-y-1.5">
-              <Label htmlFor="task-time">Est. Time (min)</Label>
+              <Label htmlFor="task-time">Est. time (min)</Label>
               <Input
                 id="task-time"
                 type="number"
@@ -124,17 +114,14 @@ export default function TaskFormModal({ open, onClose, onSave, task }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            {/* Priority */}
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label>Priority (1–5)</Label>
+              <Label>Priority</Label>
               <Select
                 value={String(form.priority)}
                 onValueChange={(v) => set('priority', Number(v))}
               >
-                <SelectTrigger id="task-priority">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger id="task-priority"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {[1, 2, 3, 4, 5].map((n) => (
                     <SelectItem key={n} value={String(n)}>
@@ -145,46 +132,37 @@ export default function TaskFormModal({ open, onClose, onSave, task }) {
               </Select>
             </div>
 
-            {/* Difficulty */}
             <div className="space-y-1.5">
-              <Label>Difficulty (1–5)</Label>
+              <Label>Difficulty</Label>
               <Select
                 value={String(form.difficulty)}
                 onValueChange={(v) => set('difficulty', Number(v))}
               >
-                <SelectTrigger id="task-difficulty">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger id="task-difficulty"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <SelectItem key={n} value={String(n)}>
-                      {n}
-                    </SelectItem>
+                    <SelectItem key={n} value={String(n)}>{n}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Energy */}
             <div className="space-y-1.5">
               <Label>Energy</Label>
               <Select
                 value={form.energyRequired}
                 onValueChange={(v) => set('energyRequired', v)}
               >
-                <SelectTrigger id="task-energy">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger id="task-energy"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">🌙 Low</SelectItem>
-                  <SelectItem value="medium">⚡ Medium</SelectItem>
-                  <SelectItem value="high">🔥 High</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          {/* Focus required checkbox */}
           <div className="flex items-center gap-2">
             <input
               id="task-focus"
@@ -193,15 +171,15 @@ export default function TaskFormModal({ open, onClose, onSave, task }) {
               onChange={(e) => set('focusRequired', e.target.checked)}
               className="w-4 h-4 rounded border-border accent-primary"
             />
-            <Label htmlFor="task-focus">Requires deep focus session</Label>
+            <Label htmlFor="task-focus">Requires deep focus</Label>
           </div>
 
           <DialogFooter className="pt-2">
             <Button type="button" variant="ghost" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" variant="brand">
-              {task ? 'Save Changes' : 'Add Task'}
+            <Button type="submit">
+              {task ? 'Save Changes' : 'Create Task'}
             </Button>
           </DialogFooter>
         </form>

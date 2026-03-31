@@ -1,30 +1,26 @@
 import { useNavigate } from 'react-router-dom'
 import { Trash2, Pencil, Play, Check, Clock, Zap, Flag } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { formatDeadline, PRIORITY_LABELS } from '@/utils/taskUtils'
+import { formatDeadline } from '@/utils/taskUtils'
 import { cn } from '@/utils/cn'
 
-const ENERGY_ICONS = { low: '🌙', medium: '⚡', high: '🔥' }
-const PRIORITY_COLORS = {
-  1: 'secondary',
-  2: 'secondary',
+const PRIORITY_DOT = {
+  1: 'bg-success',
+  2: 'bg-success',
+  3: 'bg-warning',
+  4: 'bg-danger',
+  5: 'bg-danger',
+}
+
+const PRIORITY_BADGE = {
+  1: 'success',
+  2: 'success',
   3: 'warning',
-  4: 'default',
+  4: 'destructive',
   5: 'destructive',
 }
 
-/**
- * @param {{
- *   task: import('../types').Task,
- *   onEdit?: () => void,
- *   onDelete?: () => void,
- *   onToggle?: () => void,
- *   showActions?: boolean,
- *   compact?: boolean
- * }} props
- */
 export default function TaskCard({
   task,
   onEdit,
@@ -36,130 +32,115 @@ export default function TaskCard({
   const navigate = useNavigate()
   const deadlineText = formatDeadline(task.deadline)
   const isOverdue = task.deadline && task.deadline < Date.now() && !task.completed
-  const isDueToday =
-    task.deadline &&
-    deadlineText === 'Due today' &&
-    !task.completed
 
   return (
-    <Card
+    <div
       className={cn(
-        'group transition-all duration-200 hover:shadow-md hover:border-border/80',
-        task.completed && 'opacity-60',
-        isOverdue && !task.completed && 'border-danger/40',
-        isDueToday && 'border-warning/40'
+        'group flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card transition-all duration-200 hover:shadow-soft hover:border-border/80',
+        task.completed && 'opacity-50',
+        isOverdue && 'border-l-2 border-l-danger'
       )}
     >
-      <CardContent className={cn('p-4', compact && 'p-3')}>
-        <div className="flex items-start gap-3">
-          {/* Complete toggle */}
-          <button
-            onClick={onToggle}
+      {/* Complete toggle */}
+      <button
+        onClick={onToggle}
+        className={cn(
+          'mt-0.5 w-[18px] h-[18px] rounded flex items-center justify-center shrink-0 border transition-all duration-200',
+          task.completed
+            ? 'bg-primary border-primary text-white'
+            : 'border-border hover:border-primary/60'
+        )}
+        title={task.completed ? 'Mark incomplete' : 'Mark complete'}
+      >
+        {task.completed && <Check className="w-3 h-3" strokeWidth={2.5} />}
+      </button>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          {/* Priority dot */}
+          <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', PRIORITY_DOT[task.priority] || 'bg-muted')} />
+          <h3
             className={cn(
-              'mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200',
-              task.completed
-                ? 'bg-success/80 border-success text-white'
-                : 'border-border hover:border-primary'
+              'text-[13px] font-medium leading-snug truncate',
+              task.completed && 'line-through text-muted-foreground'
             )}
-            title={task.completed ? 'Mark incomplete' : 'Mark complete'}
           >
-            {task.completed && <Check className="w-3 h-3" />}
-          </button>
+            {task.title}
+          </h3>
+        </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <h3
-              className={cn(
-                'font-medium text-sm leading-snug truncate',
-                task.completed && 'line-through text-muted-foreground'
-              )}
-            >
-              {task.title}
-            </h3>
+        {task.description && !compact && (
+          <p className="text-xs text-muted-foreground mt-0.5 ml-[14px] line-clamp-1">
+            {task.description}
+          </p>
+        )}
 
-            {task.description && !compact && (
-              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                {task.description}
-              </p>
-            )}
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5 ml-[14px]">
+          <Badge variant={PRIORITY_BADGE[task.priority] || 'secondary'}>
+            P{task.priority}
+          </Badge>
 
-            <div className="flex flex-wrap items-center gap-1.5 mt-2">
-              {/* Priority */}
-              <Badge variant={PRIORITY_COLORS[task.priority] || 'secondary'}>
-                <Flag className="w-2.5 h-2.5 mr-1" />
-                P{task.priority}
-              </Badge>
+          <Badge variant="outline">
+            {task.energyRequired}
+          </Badge>
 
-              {/* Energy */}
-              <Badge variant="outline">
-                {ENERGY_ICONS[task.energyRequired]} {task.energyRequired}
-              </Badge>
+          <Badge variant={isOverdue ? 'destructive' : 'outline'}>
+            <Clock className="w-2.5 h-2.5 mr-0.5" strokeWidth={1.75} />
+            {deadlineText}
+          </Badge>
 
-              {/* Deadline */}
-              <Badge
-                variant={
-                  isOverdue ? 'destructive' : isDueToday ? 'warning' : 'secondary'
-                }
-              >
-                <Clock className="w-2.5 h-2.5 mr-1" />
-                {deadlineText}
-              </Badge>
+          {task.estimatedTime && (
+            <Badge variant="outline">
+              {task.estimatedTime}m
+            </Badge>
+          )}
 
-              {/* Estimated time */}
-              {task.estimatedTime && (
-                <Badge variant="outline">
-                  ~{task.estimatedTime}m
-                </Badge>
-              )}
-
-              {/* Focus required */}
-              {task.focusRequired && (
-                <Badge variant="default">
-                  <Zap className="w-2.5 h-2.5 mr-1" />
-                  Focus
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          {/* Actions */}
-          {showActions && (
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7"
-                onClick={() => navigate('/focus', { state: { taskId: task.id } })}
-                title="Start focus session"
-              >
-                <Play className="w-3.5 h-3.5" />
-              </Button>
-              {onEdit && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-7 w-7"
-                  onClick={onEdit}
-                  title="Edit task"
-                >
-                  <Pencil className="w-3.5 h-3.5" />
-                </Button>
-              )}
-              {onDelete && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-7 w-7 hover:text-destructive"
-                  onClick={onDelete}
-                  title="Delete task"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
-              )}
-            </div>
+          {task.focusRequired && (
+            <Badge variant="default">
+              <Zap className="w-2.5 h-2.5 mr-0.5" strokeWidth={1.75} />
+              Focus
+            </Badge>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Actions */}
+      {showActions && (
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 shrink-0">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-7 w-7"
+            onClick={() => navigate('/focus', { state: { taskId: task.id } })}
+            title="Start focus session"
+          >
+            <Play className="w-3.5 h-3.5" strokeWidth={1.75} />
+          </Button>
+          {onEdit && (
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7"
+              onClick={onEdit}
+              title="Edit task"
+            >
+              <Pencil className="w-3.5 h-3.5" strokeWidth={1.75} />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7 hover:text-destructive"
+              onClick={onDelete}
+              title="Delete task"
+            >
+              <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

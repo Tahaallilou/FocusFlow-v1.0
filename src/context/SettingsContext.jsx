@@ -4,7 +4,7 @@ const STORAGE_KEY = 'productivity_settings'
 
 const defaultSettings = {
   focusDuration: 25,
-  theme: 'dark',
+  theme: 'light',
   shortBreak: 5,
   longBreak: 15,
 }

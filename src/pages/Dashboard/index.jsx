@@ -1,13 +1,16 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Brain,
+  Moon,
+  Zap,
+  Flame,
   CheckCircle2,
   Play,
-  CalendarClock,
+  Clock,
   Sparkles,
+  Check,
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import TaskCard from '@/components/TaskCard'
@@ -16,6 +19,8 @@ import { useHabits } from '@/context/HabitContext'
 import { getBestTask, getTodayTasks, formatDeadline, ENERGY_LEVELS } from '@/utils/taskUtils'
 import { getTodayHabits, isHabitDoneToday } from '@/utils/habitUtils'
 import { cn } from '@/utils/cn'
+
+const ENERGY_ICONS = { Moon, Zap, Flame }
 
 export default function Dashboard() {
   const [energy, setEnergy] = useState('medium')
@@ -38,92 +43,87 @@ export default function Dashboard() {
     [habitState.habits]
   )
 
-  const completedToday = taskState.tasks.filter((t) => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return t.completed && t.createdAt >= today.getTime()
-  }).length
-
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* Header stats */}
-      <div className="grid grid-cols-3 gap-4">
+    <div className="space-y-8">
+      {/* Page title */}
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        </p>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           {
-            label: 'Total Tasks',
-            value: taskState.tasks.length,
-            sub: `${taskState.tasks.filter((t) => !t.completed).length} pending`,
-            color: 'text-primary',
+            label: 'Pending',
+            value: taskState.tasks.filter((t) => !t.completed).length,
+            sub: `of ${taskState.tasks.length} total`,
           },
           {
-            label: 'Due Today',
+            label: 'Due today',
             value: todayTasks.length,
-            sub: `${todayTasks.filter((t) => t.completed).length} done`,
-            color: 'text-warning',
+            sub: `${todayTasks.filter((t) => t.completed).length} completed`,
           },
           {
-            label: "Today's Habits",
-            value: todayHabits.length,
-            sub: `${todayHabits.filter(isHabitDoneToday).length} completed`,
-            color: 'text-success',
+            label: 'Habits today',
+            value: `${todayHabits.filter(isHabitDoneToday).length}/${todayHabits.length}`,
+            sub: 'completed',
           },
         ].map((stat) => (
-          <Card key={stat.label} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-5">
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <Card key={stat.label}>
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                 {stat.label}
               </p>
-              <p className={cn('text-3xl font-bold mt-1', stat.color)}>
-                {stat.value}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stat.sub}</p>
+              <p className="text-2xl font-bold mt-1">{stat.value}</p>
+              <p className="text-xs text-muted-foreground">{stat.sub}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       {/* Energy Selector */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Brain className="w-4 h-4 text-primary" />
-            How's your energy right now?
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-3">
-            {ENERGY_LEVELS.map((lvl) => (
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5" strokeWidth={1.75} />
+          Current Energy Level
+        </h2>
+        <div className="flex gap-2">
+          {ENERGY_LEVELS.map((lvl) => {
+            const Icon = ENERGY_ICONS[lvl.iconName]
+            return (
               <button
                 key={lvl.value}
                 onClick={() => setEnergy(lvl.value)}
                 className={cn(
-                  'flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 text-sm font-medium transition-all duration-200',
+                  'flex items-center gap-2 px-4 py-2.5 rounded-md border text-sm font-medium transition-all duration-200',
                   energy === lvl.value
-                    ? 'border-primary bg-primary/10 text-primary shadow-sm'
-                    : 'border-border text-muted-foreground hover:border-border/80 hover:bg-accent'
+                    ? 'border-primary bg-primary/8 text-primary shadow-sm'
+                    : 'border-border text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
               >
-                <span className="text-base">{lvl.icon}</span>
+                <Icon className="w-4 h-4" strokeWidth={1.75} />
                 {lvl.label}
               </button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            )
+          })}
+        </div>
+      </div>
 
       {/* Suggested Task */}
-      <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
           Recommended Task
         </h2>
 
         {suggested ? (
-          <Card className="border-primary/30 bg-primary/5 hover:shadow-lg transition-all duration-200">
+          <Card className="border-primary/20 shadow-glow">
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-base leading-tight">
+                  <h3 className="text-base font-semibold leading-tight">
                     {suggested.title}
                   </h3>
                   {suggested.description && (
@@ -131,25 +131,21 @@ export default function Dashboard() {
                       {suggested.description}
                     </p>
                   )}
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    <Badge variant="default">Priority: {suggested.priority}/5</Badge>
-                    <Badge variant="warning">
-                      <CalendarClock className="w-3 h-3 mr-1" />
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    <Badge>Priority {suggested.priority}/5</Badge>
+                    <Badge variant="outline">
+                      <Clock className="w-2.5 h-2.5 mr-0.5" strokeWidth={1.75} />
                       {formatDeadline(suggested.deadline)}
                     </Badge>
-                    <Badge variant="outline">~{suggested.estimatedTime}m</Badge>
+                    <Badge variant="outline">{suggested.estimatedTime}m</Badge>
                   </div>
                 </div>
-
                 <div className="flex flex-col gap-2 shrink-0">
                   <Button
-                    variant="brand"
                     size="sm"
-                    onClick={() =>
-                      navigate('/focus', { state: { taskId: suggested.id } })
-                    }
+                    onClick={() => navigate('/focus', { state: { taskId: suggested.id } })}
                   >
-                    <Play className="w-3.5 h-3.5 mr-1" />
+                    <Play className="w-3.5 h-3.5 mr-1" strokeWidth={2} />
                     Start Focus
                   </Button>
                   <Button
@@ -157,7 +153,7 @@ export default function Dashboard() {
                     size="sm"
                     onClick={() => toggleTask(suggested.id)}
                   >
-                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" strokeWidth={1.75} />
                     Complete
                   </Button>
                 </div>
@@ -167,17 +163,10 @@ export default function Dashboard() {
         ) : (
           <Card className="border-dashed">
             <CardContent className="p-8 text-center">
-              <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-2" />
-              <p className="font-medium">All clear!</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                No pending tasks. Add some tasks to get started.
-              </p>
-              <Button
-                variant="brand"
-                size="sm"
-                className="mt-4"
-                onClick={() => navigate('/tasks')}
-              >
+              <CheckCircle2 className="w-8 h-8 text-success mx-auto mb-2" strokeWidth={1.5} />
+              <p className="font-medium">All clear</p>
+              <p className="text-sm text-muted-foreground mt-1">No pending tasks.</p>
+              <Button size="sm" className="mt-4" onClick={() => navigate('/tasks')}>
                 Add Tasks
               </Button>
             </CardContent>
@@ -185,18 +174,18 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Two columns: today tasks + habits */}
-      <div className="grid grid-cols-2 gap-6">
+      {/* Two columns */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Today's Tasks */}
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-            <CalendarClock className="w-3.5 h-3.5 text-warning" />
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5" strokeWidth={1.75} />
             Due Today
           </h2>
           {todayTasks.length === 0 ? (
             <Card className="border-dashed">
-              <CardContent className="p-6 text-center text-muted-foreground text-sm">
-                No tasks due today 🎉
+              <CardContent className="p-6 text-center text-sm text-muted-foreground">
+                No tasks due today
               </CardContent>
             </Card>
           ) : (
@@ -215,63 +204,49 @@ export default function Dashboard() {
         </div>
 
         {/* Today's Habits */}
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            🌱 Today's Habits
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" strokeWidth={1.75} />
+            Today's Habits
           </h2>
           {todayHabits.length === 0 ? (
             <Card className="border-dashed">
-              <CardContent className="p-6 text-center text-muted-foreground text-sm">
-                No habits scheduled for today.
+              <CardContent className="p-6 text-center text-sm text-muted-foreground">
+                No habits scheduled for today
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {todayHabits.map((habit) => {
                 const done = isHabitDoneToday(habit)
                 return (
-                  <Card
+                  <div
                     key={habit.id}
                     className={cn(
-                      'transition-all duration-200',
-                      done && 'opacity-70'
+                      'flex items-center gap-3 px-4 py-2.5 rounded-md border border-border bg-card transition-all duration-200',
+                      done && 'opacity-60'
                     )}
                   >
-                    <CardContent className="p-3 flex items-center gap-3">
-                      <button
-                        onClick={() => markHabitDone(habit.id)}
-                        className={cn(
-                          'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200',
-                          done
-                            ? 'bg-success/80 border-success text-white'
-                            : 'border-border hover:border-primary'
-                        )}
-                      >
-                        {done && (
-                          <svg
-                            className="w-2.5 h-2.5"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                          >
-                            <path
-                              d="M2 6l3 3 5-5"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                        )}
-                      </button>
-                      <span
-                        className={cn(
-                          'text-sm font-medium',
-                          done && 'line-through text-muted-foreground'
-                        )}
-                      >
-                        {habit.name}
-                      </span>
-                    </CardContent>
-                  </Card>
+                    <button
+                      onClick={() => markHabitDone(habit.id)}
+                      className={cn(
+                        'w-[18px] h-[18px] rounded flex items-center justify-center shrink-0 border transition-all duration-200',
+                        done
+                          ? 'bg-primary border-primary text-white'
+                          : 'border-border hover:border-primary/60'
+                      )}
+                    >
+                      {done && <Check className="w-3 h-3" strokeWidth={2.5} />}
+                    </button>
+                    <span
+                      className={cn(
+                        'text-sm font-medium',
+                        done && 'line-through text-muted-foreground'
+                      )}
+                    >
+                      {habit.name}
+                    </span>
+                  </div>
                 )
               })}
             </div>

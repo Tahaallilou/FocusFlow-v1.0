@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2, Flame, CheckCircle2 } from 'lucide-react'
+import { Plus, Trash2, Flame, CheckCircle2, Repeat2, Check } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,7 +20,6 @@ import {
   getCompletionRate,
   DAY_LABELS,
 } from '@/utils/habitUtils'
-import { generateId } from '@/utils/taskUtils'
 import { cn } from '@/utils/cn'
 
 const defaultForm = {
@@ -52,81 +51,69 @@ export default function Habits() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">Habit Tracker</h1>
-          <p className="text-sm text-muted-foreground">
-            {todayHabits.filter(isHabitDoneToday).length} / {todayHabits.length} done
-            today
+          <h1 className="text-2xl font-bold tracking-tight">Habits</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {todayHabits.filter(isHabitDoneToday).length} / {todayHabits.length} completed today
           </p>
         </div>
-        <Button variant="brand" onClick={() => setModalOpen(true)} id="add-habit-btn">
-          <Plus className="w-4 h-4 mr-1" />
+        <Button onClick={() => setModalOpen(true)} id="add-habit-btn">
+          <Plus className="w-4 h-4 mr-1" strokeWidth={2} />
           New Habit
         </Button>
       </div>
 
       {/* Today's section */}
       {todayHabits.length > 0 && (
-        <div>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Today's Habits
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            Today
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {todayHabits.map((habit) => {
               const done = isHabitDoneToday(habit)
               const streak = getHabitStreak(habit)
               return (
-                <Card
+                <div
                   key={habit.id}
                   className={cn(
-                    'transition-all duration-200',
-                    done && 'opacity-80 border-success/30 bg-success/5'
+                    'flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-card transition-all duration-200',
+                    done && 'opacity-60'
                   )}
                 >
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <button
-                      onClick={() => markHabitDone(habit.id)}
-                      className={cn(
-                        'w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200',
-                        done
-                          ? 'bg-success/80 border-success text-white'
-                          : 'border-border hover:border-primary hover:bg-accent'
-                      )}
-                    >
-                      {done && <CheckCircle2 className="w-4 h-4" />}
-                    </button>
-
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={cn(
-                          'font-medium text-sm',
-                          done && 'line-through text-muted-foreground'
-                        )}
-                      >
-                        {habit.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {habit.frequency === 'daily'
-                          ? 'Every day'
-                          : habit.days.map((d) => DAY_LABELS[d]).join(', ')}
-                      </p>
-                    </div>
-
-                    {streak > 0 && (
-                      <div className="flex items-center gap-1 text-warning">
-                        <Flame className="w-3.5 h-3.5" />
-                        <span className="text-xs font-bold">{streak}</span>
-                      </div>
+                  <button
+                    onClick={() => markHabitDone(habit.id)}
+                    className={cn(
+                      'w-5 h-5 rounded flex items-center justify-center shrink-0 border transition-all duration-200',
+                      done
+                        ? 'bg-primary border-primary text-white'
+                        : 'border-border hover:border-primary/60'
                     )}
+                  >
+                    {done && <Check className="w-3 h-3" strokeWidth={2.5} />}
+                  </button>
 
-                    <Badge variant="outline" className="text-xs">
-                      {getCompletionRate(habit)}%
-                    </Badge>
-                  </CardContent>
-                </Card>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn('text-sm font-medium', done && 'line-through text-muted-foreground')}>
+                      {habit.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {habit.frequency === 'daily' ? 'Every day' : habit.days.map((d) => DAY_LABELS[d]).join(', ')}
+                    </p>
+                  </div>
+
+                  {streak > 0 && (
+                    <div className="flex items-center gap-1 text-warning">
+                      <Flame className="w-3.5 h-3.5" strokeWidth={1.75} />
+                      <span className="text-xs font-bold">{streak}</span>
+                    </div>
+                  )}
+
+                  <Badge variant="outline">{getCompletionRate(habit)}%</Badge>
+                </div>
               )
             })}
           </div>
@@ -134,61 +121,57 @@ export default function Habits() {
       )}
 
       {/* All habits */}
-      <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
           All Habits ({state.habits.length})
         </h2>
 
         {state.habits.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">
-            <div className="text-4xl mb-3">🌱</div>
+          <div className="text-center py-16">
+            <Repeat2 className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" strokeWidth={1.25} />
             <p className="font-medium">No habits yet</p>
-            <p className="text-sm mt-1">Start building your first habit.</p>
+            <p className="text-sm text-muted-foreground mt-1">Start building your first habit.</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {state.habits.map((habit) => {
               const streak = getHabitStreak(habit)
               const rate = getCompletionRate(habit, 30)
               return (
-                <Card key={habit.id} className="group">
-                  <CardContent className="p-4 flex items-center gap-4">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{habit.name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {habit.frequency === 'daily'
-                            ? 'Daily'
-                            : habit.days.map((d) => DAY_LABELS[d]).join(', ')}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {habit.completedDates.length} total completions
-                        </span>
-                      </div>
+                <div key={habit.id} className="flex items-center gap-4 px-4 py-3 rounded-md border border-border bg-card group">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{habit.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline">
+                        {habit.frequency === 'daily' ? 'Daily' : habit.days.map((d) => DAY_LABELS[d]).join(', ')}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {habit.completedDates.length} completions
+                      </span>
                     </div>
+                  </div>
 
-                    <div className="flex items-center gap-3">
-                      {streak > 0 && (
-                        <div className="flex items-center gap-1 text-warning">
-                          <Flame className="w-4 h-4" />
-                          <span className="text-sm font-bold">{streak}d</span>
-                        </div>
-                      )}
-                      <div className="text-right">
-                        <p className="text-sm font-semibold">{rate}%</p>
-                        <p className="text-xs text-muted-foreground">30d rate</p>
+                  <div className="flex items-center gap-3 shrink-0">
+                    {streak > 0 && (
+                      <div className="flex items-center gap-1 text-warning">
+                        <Flame className="w-4 h-4" strokeWidth={1.75} />
+                        <span className="text-sm font-bold">{streak}d</span>
                       </div>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive transition-opacity"
-                        onClick={() => deleteHabit(habit.id)}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                    )}
+                    <div className="text-right">
+                      <p className="text-sm font-semibold">{rate}%</p>
+                      <p className="text-xs text-muted-foreground">30d</p>
                     </div>
-                  </CardContent>
-                </Card>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7 opacity-0 group-hover:opacity-100 hover:text-destructive transition-opacity"
+                      onClick={() => deleteHabit(habit.id)}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
+                    </Button>
+                  </div>
+                </div>
               )
             })}
           </div>
@@ -203,10 +186,10 @@ export default function Habits() {
           </DialogHeader>
           <form onSubmit={handleAdd} className="space-y-4 mt-2">
             <div className="space-y-1.5">
-              <Label htmlFor="habit-name">Habit Name *</Label>
+              <Label htmlFor="habit-name">Name</Label>
               <Input
                 id="habit-name"
-                placeholder="e.g. Read 20 minutes"
+                placeholder="e.g. Read for 20 minutes"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                 required
@@ -215,14 +198,14 @@ export default function Habits() {
 
             <div className="space-y-1.5">
               <Label>Frequency</Label>
-              <div className="flex rounded-lg border border-border overflow-hidden">
+              <div className="flex rounded-md border border-border overflow-hidden">
                 {['daily', 'custom'].map((f) => (
                   <button
                     key={f}
                     type="button"
                     onClick={() => setForm((prev) => ({ ...prev, frequency: f }))}
                     className={cn(
-                      'flex-1 py-2 text-sm font-medium capitalize transition-colors',
+                      'flex-1 py-2 text-sm font-medium capitalize transition-colors duration-200',
                       form.frequency === f
                         ? 'bg-primary text-primary-foreground'
                         : 'text-muted-foreground hover:bg-accent'
@@ -244,10 +227,10 @@ export default function Habits() {
                       type="button"
                       onClick={() => toggleDay(i)}
                       className={cn(
-                        'flex-1 py-1.5 text-xs font-medium rounded-md border transition-all duration-150',
+                        'flex-1 py-1.5 text-xs font-medium rounded border transition-all duration-150',
                         form.days.includes(i)
                           ? 'bg-primary text-primary-foreground border-primary'
-                          : 'border-border text-muted-foreground hover:border-border/80'
+                          : 'border-border text-muted-foreground hover:border-primary/40'
                       )}
                     >
                       {day}
@@ -258,12 +241,8 @@ export default function Habits() {
             )}
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={() => setModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="brand">
-                Add Habit
-              </Button>
+              <Button type="button" variant="ghost" onClick={() => setModalOpen(false)}>Cancel</Button>
+              <Button type="submit">Add Habit</Button>
             </DialogFooter>
           </form>
         </DialogContent>

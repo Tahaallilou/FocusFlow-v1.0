@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Inbox } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import TaskCard from '@/components/TaskCard'
@@ -28,7 +28,6 @@ export default function Tasks() {
     return matchFilter && matchSearch
   })
 
-  // Sort: pending by priority desc, then deadline asc; completed last
   const sorted = [...filtered].sort((a, b) => {
     if (a.completed !== b.completed) return a.completed ? 1 : -1
     if (b.priority !== a.priority) return b.priority - a.priority
@@ -47,37 +46,26 @@ export default function Tasks() {
     setEditingTask(null)
   }
 
-  const openEdit = (task) => {
-    setEditingTask(task)
-    setModalOpen(true)
-  }
-
-  const openAdd = () => {
-    setEditingTask(null)
-    setModalOpen(true)
-  }
-
   return (
-    <div className="space-y-5 max-w-3xl">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">All Tasks</h1>
-          <p className="text-sm text-muted-foreground">
-            {state.tasks.filter((t) => !t.completed).length} pending,{' '}
-            {state.tasks.filter((t) => t.completed).length} completed
+          <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {state.tasks.filter((t) => !t.completed).length} pending · {state.tasks.filter((t) => t.completed).length} completed
           </p>
         </div>
-        <Button variant="brand" onClick={openAdd} id="add-task-btn">
-          <Plus className="w-4 h-4 mr-1" />
-          Add Task
+        <Button onClick={() => { setEditingTask(null); setModalOpen(true) }} id="add-task-btn">
+          <Plus className="w-4 h-4 mr-1" strokeWidth={2} />
+          New Task
         </Button>
       </div>
 
       {/* Search + Filters */}
       <div className="flex items-center gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" strokeWidth={1.75} />
           <Input
             id="task-search"
             placeholder="Search tasks..."
@@ -87,16 +75,16 @@ export default function Tasks() {
           />
         </div>
 
-        <div className="flex rounded-lg border border-border overflow-hidden">
+        <div className="flex rounded-md border border-border overflow-hidden">
           {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={cn(
-                'px-4 py-2 text-sm font-medium transition-colors',
+                'px-3 py-1.5 text-xs font-medium transition-colors duration-200',
                 filter === f
                   ? 'bg-primary text-primary-foreground'
-                  : 'bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
               )}
             >
               {f}
@@ -107,22 +95,20 @@ export default function Tasks() {
 
       {/* Task list */}
       {sorted.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <div className="text-4xl mb-3">📭</div>
-          <p className="font-medium">No tasks found</p>
-          <p className="text-sm mt-1">
-            {filter === 'All'
-              ? 'Create your first task to get started.'
-              : `No ${filter.toLowerCase()} tasks.`}
+        <div className="text-center py-16">
+          <Inbox className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" strokeWidth={1.25} />
+          <p className="font-medium text-foreground">No tasks found</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {filter === 'All' ? 'Create your first task to get started.' : `No ${filter.toLowerCase()} tasks.`}
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {sorted.map((task) => (
             <div key={task.id} className="animate-fade-in">
               <TaskCard
                 task={task}
-                onEdit={() => openEdit(task)}
+                onEdit={() => { setEditingTask(task); setModalOpen(true) }}
                 onDelete={() => deleteTask(task.id)}
                 onToggle={() => toggleTask(task.id)}
               />
@@ -133,10 +119,7 @@ export default function Tasks() {
 
       <TaskFormModal
         open={modalOpen}
-        onClose={() => {
-          setModalOpen(false)
-          setEditingTask(null)
-        }}
+        onClose={() => { setModalOpen(false); setEditingTask(null) }}
         onSave={handleSave}
         task={editingTask}
       />

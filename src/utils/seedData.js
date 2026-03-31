@@ -233,7 +233,7 @@ export function seedLocalStorage() {
     focusDuration: 25,
     shortBreak: 5,
     longBreak: 15,
-    theme: 'dark',
+    theme: 'light',
   }
 
   // ── WRITE TO LOCALSTORAGE ────────────────────────────────────────────────

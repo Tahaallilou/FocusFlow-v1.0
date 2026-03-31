@@ -35,16 +35,15 @@ export default function CalendarPage() {
     const task = event.resource
     const isCompleted = task.completed
     const isOverdue = task.deadline < Date.now() && !task.completed
-
     return {
       style: {
         backgroundColor: isCompleted
-          ? 'hsl(142 76% 50% / 0.7)'
+          ? 'hsl(160 84% 39% / 0.7)'
           : isOverdue
-          ? 'hsl(0 72% 57% / 0.8)'
-          : 'hsl(210 100% 66% / 0.8)',
+          ? 'hsl(0 84% 60% / 0.75)'
+          : 'hsl(251 85% 68% / 0.8)',
         border: 'none',
-        borderRadius: '4px',
+        borderRadius: '3px',
         color: 'white',
         fontSize: '12px',
         fontWeight: '500',
@@ -53,16 +52,21 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-3 text-xs font-medium">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Calendar</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Task deadlines at a glance</p>
+      </div>
+
+      <div className="flex gap-4 text-xs font-medium">
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm bg-primary/80 inline-block" /> Pending
+          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: 'hsl(251 85% 68%)' }} /> Pending
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm bg-success/80 inline-block" /> Completed
+          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: 'hsl(160 84% 39%)' }} /> Completed
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm bg-destructive/80 inline-block" /> Overdue
+          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: 'hsl(0 84% 60%)' }} /> Overdue
         </span>
       </div>
 
@@ -73,7 +77,7 @@ export default function CalendarPage() {
             events={events}
             startAccessor="start"
             endAccessor="end"
-            style={{ height: 580 }}
+            style={{ height: 560 }}
             eventPropGetter={eventStyle}
             popup
             tooltipAccessor={(e) => e.title}
