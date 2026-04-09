@@ -14,41 +14,38 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
-      {/* Main content — below fixed nav, centered */}
-      <main className="pt-14">
-        <div className="page-container py-8">
-          {/* Dev seed button — top right floating */}
-          <div className="flex justify-end mb-6">
-            <button
-              onClick={handleSeed}
-              title="Load demo data to test the app"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-medium transition-all duration-200 ${
-                seeded
-                  ? 'border-success/40 bg-success/8 text-success'
-                  : 'border-border text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5'
-              }`}
-              id="seed-data-btn"
-            >
-              {seeded ? (
-                <>
-                  <Check className="w-3.5 h-3.5" strokeWidth={2} />
-                  Done — Reloading
-                </>
-              ) : (
-                <>
-                  <DatabaseZap className="w-3.5 h-3.5" strokeWidth={1.75} />
-                  Load Demo Data
-                </>
-              )}
-            </button>
-          </div>
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 pt-20 pb-8">
+        {/* Dev seed button */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleSeed}
+            title="Load demo data to test the app"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-medium transition-all duration-200 ${
+              seeded
+                ? 'border-success/40 bg-success/8 text-success'
+                : 'border-border text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5'
+            }`}
+            id="seed-data-btn"
+          >
+            {seeded ? (
+              <>
+                <Check className="w-3.5 h-3.5" strokeWidth={2} />
+                Done — Reloading
+              </>
+            ) : (
+              <>
+                <DatabaseZap className="w-3.5 h-3.5" strokeWidth={1.75} />
+                Load Demo Data
+              </>
+            )}
+          </button>
+        </div>
 
-          <div className="animate-fade-in">
-            <Outlet />
-          </div>
+        <div className="animate-fade-in">
+          <Outlet />
         </div>
       </main>
     </div>

@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2, Flame, CheckCircle2, Repeat2, Check } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Plus, Trash2, Flame, Check, Repeat2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,6 +20,7 @@ import {
   DAY_LABELS,
 } from '@/utils/habitUtils'
 import { cn } from '@/utils/cn'
+import HabitHeatmap from '@/components/HabitHeatmap'
 
 const defaultForm = {
   name: '',
@@ -38,7 +38,9 @@ export default function Habits() {
   const toggleDay = (day) => {
     setForm((f) => ({
       ...f,
-      days: f.days.includes(day) ? f.days.filter((d) => d !== day) : [...f.days, day],
+      days: f.days.includes(day)
+        ? f.days.filter((d) => d !== day)
+        : [...f.days, day],
     }))
   }
 
@@ -53,11 +55,12 @@ export default function Habits() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Habits</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {todayHabits.filter(isHabitDoneToday).length} / {todayHabits.length} completed today
+            {todayHabits.filter(isHabitDoneToday).length} /{' '}
+            {todayHabits.length} completed today
           </p>
         </div>
         <Button onClick={() => setModalOpen(true)} id="add-habit-btn">
@@ -68,7 +71,7 @@ export default function Habits() {
 
       {/* Today's section */}
       {todayHabits.length > 0 && (
-        <div className="space-y-3">
+        <div className="bg-card rounded-xl border border-border shadow-soft p-4 space-y-3">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
             Today
           </h2>
@@ -80,7 +83,7 @@ export default function Habits() {
                 <div
                   key={habit.id}
                   className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-card transition-all duration-200',
+                    'flex items-center gap-3 px-3 py-3 rounded-md border border-border bg-background transition-all duration-200',
                     done && 'opacity-60'
                   )}
                 >
@@ -95,24 +98,30 @@ export default function Habits() {
                   >
                     {done && <Check className="w-3 h-3" strokeWidth={2.5} />}
                   </button>
-
                   <div className="flex-1 min-w-0">
-                    <p className={cn('text-sm font-medium', done && 'line-through text-muted-foreground')}>
+                    <p
+                      className={cn(
+                        'text-sm font-medium',
+                        done && 'line-through text-muted-foreground'
+                      )}
+                    >
                       {habit.name}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {habit.frequency === 'daily' ? 'Every day' : habit.days.map((d) => DAY_LABELS[d]).join(', ')}
+                      {habit.frequency === 'daily'
+                        ? 'Every day'
+                        : habit.days.map((d) => DAY_LABELS[d]).join(', ')}
                     </p>
                   </div>
-
                   {streak > 0 && (
-                    <div className="flex items-center gap-1 text-warning">
+                    <div className="flex items-center gap-1 text-warning shrink-0">
                       <Flame className="w-3.5 h-3.5" strokeWidth={1.75} />
                       <span className="text-xs font-bold">{streak}</span>
                     </div>
                   )}
-
-                  <Badge variant="outline">{getCompletionRate(habit)}%</Badge>
+                  <Badge variant="outline" className="shrink-0">
+                    {getCompletionRate(habit)}%
+                  </Badge>
                 </div>
               )
             })}
@@ -120,17 +129,25 @@ export default function Habits() {
         </div>
       )}
 
+      {/* Heatmap */}
+      <HabitHeatmap />
+
       {/* All habits */}
-      <div className="space-y-3">
+      <div className="bg-card rounded-xl border border-border shadow-soft p-4 space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
           All Habits ({state.habits.length})
         </h2>
 
         {state.habits.length === 0 ? (
-          <div className="text-center py-16">
-            <Repeat2 className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" strokeWidth={1.25} />
+          <div className="text-center py-12">
+            <Repeat2
+              className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3"
+              strokeWidth={1.25}
+            />
             <p className="font-medium">No habits yet</p>
-            <p className="text-sm text-muted-foreground mt-1">Start building your first habit.</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Start building your first habit.
+            </p>
           </div>
         ) : (
           <div className="space-y-1.5">
@@ -138,19 +155,23 @@ export default function Habits() {
               const streak = getHabitStreak(habit)
               const rate = getCompletionRate(habit, 30)
               return (
-                <div key={habit.id} className="flex items-center gap-4 px-4 py-3 rounded-md border border-border bg-card group">
+                <div
+                  key={habit.id}
+                  className="flex items-center gap-4 px-3 py-3 rounded-md border border-border bg-background group"
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{habit.name}</p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
                       <Badge variant="outline">
-                        {habit.frequency === 'daily' ? 'Daily' : habit.days.map((d) => DAY_LABELS[d]).join(', ')}
+                        {habit.frequency === 'daily'
+                          ? 'Daily'
+                          : habit.days.map((d) => DAY_LABELS[d]).join(', ')}
                       </Badge>
                       <span className="text-xs text-muted-foreground">
                         {habit.completedDates.length} completions
                       </span>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-3 shrink-0">
                     {streak > 0 && (
                       <div className="flex items-center gap-1 text-warning">
@@ -158,7 +179,7 @@ export default function Habits() {
                         <span className="text-sm font-bold">{streak}d</span>
                       </div>
                     )}
-                    <div className="text-right">
+                    <div className="text-right hidden sm:block">
                       <p className="text-sm font-semibold">{rate}%</p>
                       <p className="text-xs text-muted-foreground">30d</p>
                     </div>
@@ -191,7 +212,9 @@ export default function Habits() {
                 id="habit-name"
                 placeholder="e.g. Read for 20 minutes"
                 value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, name: e.target.value }))
+                }
                 required
               />
             </div>
@@ -203,7 +226,9 @@ export default function Habits() {
                   <button
                     key={f}
                     type="button"
-                    onClick={() => setForm((prev) => ({ ...prev, frequency: f }))}
+                    onClick={() =>
+                      setForm((prev) => ({ ...prev, frequency: f }))
+                    }
                     className={cn(
                       'flex-1 py-2 text-sm font-medium capitalize transition-colors duration-200',
                       form.frequency === f
@@ -241,7 +266,13 @@ export default function Habits() {
             )}
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={() => setModalOpen(false)}>Cancel</Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setModalOpen(false)}
+              >
+                Cancel
+              </Button>
               <Button type="submit">Add Habit</Button>
             </DialogFooter>
           </form>

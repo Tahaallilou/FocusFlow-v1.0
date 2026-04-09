@@ -1,6 +1,7 @@
-import { createContext, useContext, useReducer, useEffect } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { generateId } from '../utils/taskUtils'
 import { getTodayString } from '../utils/habitUtils'
+import { useEnhancedReducer } from '../hooks/useEnhancedReducer'
 
 const STORAGE_KEY = 'productivity_habits'
 
@@ -60,7 +61,7 @@ function habitReducer(state, action) {
 const HabitContext = createContext(null)
 
 export function HabitProvider({ children }) {
-  const [state, dispatch] = useReducer(habitReducer, initialState)
+  const [state, dispatch] = useEnhancedReducer(habitReducer, initialState, 'habits')
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.habits))

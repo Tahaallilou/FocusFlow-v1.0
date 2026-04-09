@@ -1,5 +1,6 @@
-import { createContext, useContext, useReducer, useEffect } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { generateId } from '../utils/taskUtils'
+import { useEnhancedReducer } from '../hooks/useEnhancedReducer'
 
 const STORAGE_KEY = 'productivity_sessions'
 
@@ -42,7 +43,7 @@ function sessionReducer(state, action) {
 const SessionContext = createContext(null)
 
 export function SessionProvider({ children }) {
-  const [state, dispatch] = useReducer(sessionReducer, initialState)
+  const [state, dispatch] = useEnhancedReducer(sessionReducer, initialState, 'sessions')
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.sessions))

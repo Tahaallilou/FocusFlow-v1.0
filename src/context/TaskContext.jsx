@@ -1,5 +1,6 @@
-import { createContext, useContext, useReducer, useEffect } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { generateId } from '../utils/taskUtils'
+import { useEnhancedReducer } from '../hooks/useEnhancedReducer'
 
 const STORAGE_KEY = 'productivity_tasks'
 
@@ -57,7 +58,7 @@ function taskReducer(state, action) {
 const TaskContext = createContext(null)
 
 export function TaskProvider({ children }) {
-  const [state, dispatch] = useReducer(taskReducer, initialState)
+  const [state, dispatch] = useEnhancedReducer(taskReducer, initialState, 'tasks')
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks))

@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AlertTriangle, BookOpen, Trash2, Zap, Play } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertTriangle, BookOpen, Archive, Zap, Play } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useTasks } from '@/context/TaskContext'
@@ -14,7 +13,7 @@ const QUADRANTS = [
     title: 'Do First',
     subtitle: 'Urgent + Important',
     icon: AlertTriangle,
-    accentClass: 'border-t-2 border-t-danger',
+    accent: 'border-t-2 border-t-[#EF4444]',
     badge: 'destructive',
     filter: (c) => c.urgent && c.important,
   },
@@ -23,25 +22,25 @@ const QUADRANTS = [
     title: 'Schedule',
     subtitle: 'Not Urgent + Important',
     icon: BookOpen,
-    accentClass: 'border-t-2 border-t-primary',
+    accent: 'border-t-2 border-t-[#7C6CF2]',
     badge: 'default',
     filter: (c) => !c.urgent && c.important,
   },
   {
     key: 'urgent-not-important',
-    title: 'Delegate',
+    title: 'Quick Tasks',
     subtitle: 'Urgent + Not Important',
     icon: Zap,
-    accentClass: 'border-t-2 border-t-warning',
+    accent: 'border-t-2 border-t-[#F59E0B]',
     badge: 'warning',
     filter: (c) => c.urgent && !c.important,
   },
   {
     key: 'not-urgent-not-important',
-    title: 'Eliminate',
+    title: 'Backlog',
     subtitle: 'Not Urgent + Not Important',
-    icon: Trash2,
-    accentClass: 'border-t-2 border-t-border',
+    icon: Archive,
+    accent: 'border-t-2 border-t-border',
     badge: 'secondary',
     filter: (c) => !c.urgent && !c.important,
   },
@@ -72,29 +71,37 @@ export default function Eisenhower() {
           const tasks = classified.filter((c) => q.filter(c))
 
           return (
-            <Card key={q.key} className={cn('min-h-[240px]', q.accentClass)}>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <Icon className="w-4 h-4" strokeWidth={1.75} />
-                  <span>{q.title}</span>
-                  <Badge variant={q.badge} className="ml-auto">{tasks.length}</Badge>
-                </CardTitle>
-                <p className="text-xs text-muted-foreground">{q.subtitle}</p>
-              </CardHeader>
+            <div
+              key={q.key}
+              className={cn(
+                'bg-card rounded-xl border border-border shadow-soft p-4 min-h-[220px]',
+                q.accent
+              )}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <Icon className="w-4 h-4 text-muted-foreground" strokeWidth={1.75} />
+                <span className="text-sm font-semibold">{q.title}</span>
+                <Badge variant={q.badge} className="ml-auto">
+                  {tasks.length}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">{q.subtitle}</p>
 
-              <CardContent className="pt-0 space-y-1.5">
-                {tasks.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic py-6 text-center">
-                    No tasks in this quadrant
-                  </p>
-                ) : (
-                  tasks.map(({ task }) => (
+              {tasks.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic py-6 text-center">
+                  No tasks in this quadrant
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {tasks.map(({ task }) => (
                     <div
                       key={task.id}
                       className="flex items-start gap-2 p-2.5 rounded-md bg-background border border-transparent group hover:border-border transition-colors duration-200"
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium truncate">{task.title}</p>
+                        <p className="text-[13px] font-medium truncate">
+                          {task.title}
+                        </p>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           P{task.priority} · {formatDeadline(task.deadline)}
                         </p>
@@ -103,16 +110,18 @@ export default function Eisenhower() {
                         size="icon"
                         variant="ghost"
                         className="h-6 w-6 opacity-0 group-hover:opacity-100 shrink-0"
-                        onClick={() => navigate('/focus', { state: { taskId: task.id } })}
+                        onClick={() =>
+                          navigate('/app/focus', { state: { taskId: task.id } })
+                        }
                         title="Start focus session"
                       >
                         <Play className="w-3 h-3" strokeWidth={2} />
                       </Button>
                     </div>
-                  ))
-                )}
-              </CardContent>
-            </Card>
+                  ))}
+                </div>
+              )}
+            </div>
           )
         })}
       </div>

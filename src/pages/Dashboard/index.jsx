@@ -9,8 +9,8 @@ import {
   Clock,
   Sparkles,
   Check,
+  ArrowRight,
 } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import TaskCard from '@/components/TaskCard'
@@ -43,13 +43,21 @@ export default function Dashboard() {
     [habitState.habits]
   )
 
+  const pendingCount = taskState.tasks.filter((t) => !t.completed).length
+  const completedTodayCount = todayTasks.filter((t) => t.completed).length
+  const habitsDoneCount = todayHabits.filter(isHabitDoneToday).length
+
   return (
-    <div className="space-y-8">
-      {/* Page title */}
+    <div className="space-y-6">
+      {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          {new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+          })}
         </p>
       </div>
 
@@ -58,39 +66,40 @@ export default function Dashboard() {
         {[
           {
             label: 'Pending',
-            value: taskState.tasks.filter((t) => !t.completed).length,
+            value: pendingCount,
             sub: `of ${taskState.tasks.length} total`,
           },
           {
-            label: 'Due today',
+            label: 'Due Today',
             value: todayTasks.length,
-            sub: `${todayTasks.filter((t) => t.completed).length} completed`,
+            sub: `${completedTodayCount} completed`,
           },
           {
-            label: 'Habits today',
-            value: `${todayHabits.filter(isHabitDoneToday).length}/${todayHabits.length}`,
+            label: 'Habits Today',
+            value: `${habitsDoneCount}/${todayHabits.length}`,
             sub: 'completed',
           },
         ].map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                {stat.label}
-              </p>
-              <p className="text-2xl font-bold mt-1">{stat.value}</p>
-              <p className="text-xs text-muted-foreground">{stat.sub}</p>
-            </CardContent>
-          </Card>
+          <div
+            key={stat.label}
+            className="bg-card rounded-xl border border-border shadow-soft p-4"
+          >
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+              {stat.label}
+            </p>
+            <p className="text-2xl font-bold mt-1">{stat.value}</p>
+            <p className="text-xs text-muted-foreground">{stat.sub}</p>
+          </div>
         ))}
       </div>
 
-      {/* Energy Selector */}
-      <div className="space-y-3">
+      {/* Energy selector */}
+      <div className="bg-card rounded-xl border border-border shadow-soft p-4 space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5" strokeWidth={1.75} />
           Current Energy Level
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {ENERGY_LEVELS.map((lvl) => {
             const Icon = ENERGY_ICONS[lvl.iconName]
             return (
@@ -100,7 +109,7 @@ export default function Dashboard() {
                 className={cn(
                   'flex items-center gap-2 px-4 py-2.5 rounded-md border text-sm font-medium transition-all duration-200',
                   energy === lvl.value
-                    ? 'border-primary bg-primary/8 text-primary shadow-sm'
+                    ? 'border-primary bg-primary/10 text-primary shadow-sm'
                     : 'border-border text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
               >
@@ -112,85 +121,105 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Suggested Task */}
+      {/* Suggested task */}
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
           Recommended Task
         </h2>
 
         {suggested ? (
-          <Card className="border-primary/20 shadow-glow">
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold leading-tight">
-                    {suggested.title}
-                  </h3>
-                  {suggested.description && (
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {suggested.description}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    <Badge>Priority {suggested.priority}/5</Badge>
-                    <Badge variant="outline">
-                      <Clock className="w-2.5 h-2.5 mr-0.5" strokeWidth={1.75} />
-                      {formatDeadline(suggested.deadline)}
-                    </Badge>
-                    <Badge variant="outline">{suggested.estimatedTime}m</Badge>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 shrink-0">
-                  <Button
-                    size="sm"
-                    onClick={() => navigate('/focus', { state: { taskId: suggested.id } })}
-                  >
-                    <Play className="w-3.5 h-3.5 mr-1" strokeWidth={2} />
-                    Start Focus
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => toggleTask(suggested.id)}
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5 mr-1" strokeWidth={1.75} />
-                    Complete
-                  </Button>
+          <div className="bg-card rounded-xl border border-primary/20 shadow-glow p-5">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-semibold leading-tight">
+                  {suggested.title}
+                </h3>
+                {suggested.description && (
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {suggested.description}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                  <Badge>Priority {suggested.priority}/5</Badge>
+                  <Badge variant="outline">
+                    <Clock className="w-2.5 h-2.5 mr-0.5" strokeWidth={1.75} />
+                    {formatDeadline(suggested.deadline)}
+                  </Badge>
+                  <Badge variant="outline">{suggested.estimatedTime}m</Badge>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex sm:flex-col gap-2 shrink-0">
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    navigate('/app/focus', { state: { taskId: suggested.id } })
+                  }
+                >
+                  <Play className="w-3.5 h-3.5 mr-1" strokeWidth={2} />
+                  Start Focus
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => toggleTask(suggested.id)}
+                >
+                  <CheckCircle2
+                    className="w-3.5 h-3.5 mr-1"
+                    strokeWidth={1.75}
+                  />
+                  Complete
+                </Button>
+              </div>
+            </div>
+          </div>
         ) : (
-          <Card className="border-dashed">
-            <CardContent className="p-8 text-center">
-              <CheckCircle2 className="w-8 h-8 text-success mx-auto mb-2" strokeWidth={1.5} />
-              <p className="font-medium">All clear</p>
-              <p className="text-sm text-muted-foreground mt-1">No pending tasks.</p>
-              <Button size="sm" className="mt-4" onClick={() => navigate('/tasks')}>
-                Add Tasks
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="bg-card rounded-xl border border-dashed border-border p-8 text-center">
+            <CheckCircle2
+              className="w-8 h-8 text-success mx-auto mb-2"
+              strokeWidth={1.5}
+            />
+            <p className="font-medium">All clear</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              No pending tasks.
+            </p>
+            <Button
+              size="sm"
+              className="mt-4"
+              onClick={() => navigate('/app/tasks')}
+            >
+              Add Tasks
+            </Button>
+          </div>
         )}
       </div>
 
       {/* Two columns */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Today's Tasks */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" strokeWidth={1.75} />
-            Due Today
-          </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Today's tasks */}
+        <div className="bg-card rounded-xl border border-border shadow-soft p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" strokeWidth={1.75} />
+              Due Today
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => navigate('/app/tasks')}
+            >
+              View all
+              <ArrowRight className="w-3 h-3 ml-1" strokeWidth={1.75} />
+            </Button>
+          </div>
+
           {todayTasks.length === 0 ? (
-            <Card className="border-dashed">
-              <CardContent className="p-6 text-center text-sm text-muted-foreground">
-                No tasks due today
-              </CardContent>
-            </Card>
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No tasks due today
+            </p>
           ) : (
             <div className="space-y-2">
-              {todayTasks.map((task) => (
+              {todayTasks.slice(0, 5).map((task) => (
                 <TaskCard
                   key={task.id}
                   task={task}
@@ -203,18 +232,28 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Today's Habits */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" strokeWidth={1.75} />
-            Today's Habits
-          </h2>
+        {/* Today's habits */}
+        <div className="bg-card rounded-xl border border-border shadow-soft p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" strokeWidth={1.75} />
+              Today's Habits
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => navigate('/app/habits')}
+            >
+              View all
+              <ArrowRight className="w-3 h-3 ml-1" strokeWidth={1.75} />
+            </Button>
+          </div>
+
           {todayHabits.length === 0 ? (
-            <Card className="border-dashed">
-              <CardContent className="p-6 text-center text-sm text-muted-foreground">
-                No habits scheduled for today
-              </CardContent>
-            </Card>
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No habits scheduled
+            </p>
           ) : (
             <div className="space-y-1.5">
               {todayHabits.map((habit) => {
@@ -223,7 +262,7 @@ export default function Dashboard() {
                   <div
                     key={habit.id}
                     className={cn(
-                      'flex items-center gap-3 px-4 py-2.5 rounded-md border border-border bg-card transition-all duration-200',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-background transition-all duration-200',
                       done && 'opacity-60'
                     )}
                   >
@@ -236,7 +275,9 @@ export default function Dashboard() {
                           : 'border-border hover:border-primary/60'
                       )}
                     >
-                      {done && <Check className="w-3 h-3" strokeWidth={2.5} />}
+                      {done && (
+                        <Check className="w-3 h-3" strokeWidth={2.5} />
+                      )}
                     </button>
                     <span
                       className={cn(

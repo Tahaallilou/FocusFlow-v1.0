@@ -112,7 +112,7 @@ export default function TaskCard({
             size="icon"
             variant="ghost"
             className="h-7 w-7"
-            onClick={() => navigate('/focus', { state: { taskId: task.id } })}
+            onClick={() => navigate('/app/focus', { state: { taskId: task.id } })}
             title="Start focus session"
           >
             <Play className="w-3.5 h-3.5" strokeWidth={1.75} />

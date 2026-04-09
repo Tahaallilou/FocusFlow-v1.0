@@ -108,9 +108,9 @@
     background: linear-gradient(135deg, #6B5CE0 0%, #9B7EF0 100%);
   }
 
-  /* Text gradient */
+  /* Text gradient — used for FocusFlow logo */
   .gradient-text {
-    background: linear-gradient(135deg, #7C6CF2 0%, #A88BFF 100%);
+    background: linear-gradient(135deg, #7C6CF2 0%, #A88BFF 60%, #6f8fff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -140,6 +140,31 @@
   .page-container {
     @apply max-w-container mx-auto w-full px-6;
   }
+
+  /* ── Habit Heatmap (react-calendar-heatmap overrides) ── */
+  .heatmap-wrap .react-calendar-heatmap text {
+    font-size: 8px;
+    fill: hsl(var(--muted-foreground));
+  }
+  .heatmap-wrap .react-calendar-heatmap rect {
+    rx: 2;
+    ry: 2;
+  }
+  /* Override default colors */
+  .heatmap-wrap .color-empty,
+  .heatmap-empty { fill: hsl(var(--muted) / 0.3); }
+
+  .heatmap-scale-1 { fill: rgba(124, 108, 242, 0.22); }
+  .heatmap-scale-2 { fill: rgba(124, 108, 242, 0.48); }
+  .heatmap-scale-3 { fill: rgba(124, 108, 242, 0.74); }
+  .heatmap-scale-4 { fill: rgba(124, 108, 242, 1.00); }
+
+  /* Legend squares */
+  .heatmap-legend-0 { background: hsl(var(--muted) / 0.5); }
+  .heatmap-legend-1 { background: rgba(124, 108, 242, 0.22); }
+  .heatmap-legend-2 { background: rgba(124, 108, 242, 0.48); }
+  .heatmap-legend-3 { background: rgba(124, 108, 242, 0.74); }
+  .heatmap-legend-4 { background: rgba(124, 108, 242, 1.00); }
 }
 
 /* ═══════════════════════════════════════════
@@ -173,14 +198,12 @@
 }
 
 .rbc-event {
-  background: hsl(var(--primary) / 0.85) !important;
   border: none !important;
   @apply rounded text-xs font-medium;
-  color: white !important;
 }
 
 .rbc-event.rbc-selected {
-  background: hsl(var(--primary)) !important;
+  opacity: 0.9;
 }
 
 .rbc-show-more {
