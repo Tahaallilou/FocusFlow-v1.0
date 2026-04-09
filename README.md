@@ -1,4 +1,4 @@
-# 🚀 FocusFlow
+#  FocusFlow
 
 FocusFlow is a modern, all-in-one productivity web application designed to help users **plan, prioritize, and execute their work efficiently**.
 
@@ -6,7 +6,7 @@ It combines task management, habit tracking, focus sessions, and analytics into 
 
 ---
 
-## 🌟 Overview
+##  Overview
 
 FocusFlow is built as a **frontend-only application** that runs entirely in the browser.
 All user data is stored locally, ensuring **privacy, speed, and offline capability**.
@@ -24,16 +24,16 @@ FocusFlow provides a structured system to:
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
-### 🧠 Smart Task Management
+###  Smart Task Management
 
 * Create, edit, and delete tasks
 * Set priorities and deadlines
 * Filter and search tasks
 * Track completion status
 
-### ⚡ Smart Task Recommendation
+###  Smart Task Recommendation
 
 * Suggests the **best task to work on**
 * Based on:
@@ -44,7 +44,7 @@ FocusFlow provides a structured system to:
 
 ---
 
-### 🔁 Habit Tracking
+### Habit Tracking
 
 * Create daily or custom habits
 * Track streaks and consistency
@@ -53,7 +53,7 @@ FocusFlow provides a structured system to:
 
 ---
 
-### ⏱️ Focus Timer (Pomodoro System)
+###  Focus Timer (Pomodoro System)
 
 * Start focused work sessions
 * Link sessions to tasks
@@ -62,7 +62,7 @@ FocusFlow provides a structured system to:
 
 ---
 
-### 📊 Analytics Dashboard
+###  Analytics Dashboard
 
 * Task completion trends
 * Focus time evolution
@@ -71,7 +71,7 @@ FocusFlow provides a structured system to:
 
 ---
 
-### 📅 Calendar View
+###  Calendar View
 
 * Visualize task deadlines
 * Navigate tasks by date
@@ -79,7 +79,7 @@ FocusFlow provides a structured system to:
 
 ---
 
-### 🧩 Eisenhower Matrix
+###  Eisenhower Matrix
 
 * Automatic task categorization:
 
@@ -90,14 +90,14 @@ FocusFlow provides a structured system to:
 
 ---
 
-### 📝 Notes System
+###  Notes System
 
 * Quick capture for ideas and thoughts
 * Lightweight and fast
 
 ---
 
-### ⚙️ Settings & Customization
+###  Settings & Customization
 
 * Light / Dark mode
 * Focus timer configuration
@@ -106,7 +106,7 @@ FocusFlow provides a structured system to:
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Core
 
@@ -133,7 +133,7 @@ FocusFlow provides a structured system to:
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 The application follows a **modular and scalable architecture**:
 
@@ -170,7 +170,7 @@ src/
 
 ---
 
-## ⚙️ Installation
+##  Installation
 
 ```bash
 git clone https://github.com/Tahaallilou/FocusFlow-v1.0.git
@@ -181,7 +181,7 @@ npm run dev
 
 ---
 
-## 📦 Build
+##  Build
 
 ```bash
 npm run build
@@ -189,7 +189,7 @@ npm run build
 
 ---
 
-## 🚀 Usage
+##  Usage
 
 1. Create tasks with priorities and deadlines
 2. Track your habits daily
@@ -199,7 +199,7 @@ npm run build
 
 ---
 
-## 🎯 Project Objectives
+##  Project Objectives
 
 The goal of FocusFlow is to:
 
@@ -210,7 +210,7 @@ The goal of FocusFlow is to:
 
 ---
 
-## ⚠️ Limitations
+##  Limitations
 
 * No backend (data stored locally)
 * No real authentication system
@@ -218,7 +218,7 @@ The goal of FocusFlow is to:
 
 ---
 
-## 🔮 Future Improvements
+##  Future Improvements
 
 * Backend integration (Node.js / database)
 * Real authentication system
